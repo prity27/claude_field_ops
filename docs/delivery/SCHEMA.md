@@ -215,8 +215,19 @@ stored), `expiresAt` (timestamp, **TTL index**), `revokedAt` (timestamp, nullabl
 Class: **secret**.
 
 **AuditLog** — `actor` (→User, indexed), `action` (enum: the list in BE-01-08 AC-1), `targetType` +
-`targetId`, `outcome` (`success|denied`), `metadata` (object, **no PII, no tokens**), `createdAt`
-(indexed descending). **Append-only:** no update or delete path exists at any layer (BE-01-08 AC-2).
+`targetId`, `outcome` (`success|denied`), `source` (string, nullable), `metadata` (object, **no PII,
+no tokens**), `createdAt` (indexed descending). **Append-only:** no update or delete path exists at
+any layer (BE-01-08 AC-2).
+
+`source` was added after validation, during BE-01 — recorded here rather than left only in code, for
+the same reason `PasswordResetToken` is above. It holds the request origin (`req.ip`) for entries a
+request produced, and `null` otherwise. It exists because BE-01-02 AC-3 requires a failed attempt to
+be logged "with the source" and an unauthenticated failure has no `actor` to attribute it to
+(`server/src/models/AuditLog.js:34`, threaded from `server/src/routes/auth.js:27` via
+`server/src/lib/requestSource.js`). It carries **no index** deliberately: no reader queries by it
+yet, and the rule below is that no index here is speculative. **`trust proxy` is not configured**
+(`server/src/app.js`), so today the value is the TCP peer — behind a terminator it would record the
+proxy. See `q-audit-source-trust` in `OPEN-QUESTIONS.md`.
 
 ---
 
@@ -274,6 +285,7 @@ a default local install and many single-VM deployments are — does not support 
 | --- | --- | --- |
 | **secret** | `User.passwordHash`, `RefreshToken.tokenHash` | KDF/hash only; excluded from every projection **by default**; never logged, never returned |
 | **PII** | `User.email`, `User.name`, `Technician.name`, `Technician.email`, `Customer.name`, `Customer.siteAddress`, `Customer.contactPhone`, `Customer.contactEmail` | never in logs (INF-00-06 AC-3), never in `AuditLog.metadata`; retention **blocked on `q-pii-retention`** |
+| **PII** | `AuditLog.source` (a network origin, not contact detail — but personal data where GDPR applies) | never returned to a non-dispatcher; retention **blocked on `q-pii-retention`**, which `AuditLog` cannot satisfy today because it is deliberately delete-free with no TTL |
 | PHI | — | none; this is not a healthcare product |
 | internal | everything else | — |
 

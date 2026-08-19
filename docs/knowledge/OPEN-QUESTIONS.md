@@ -140,7 +140,23 @@ Customer addresses and technician scheduling data are both personal data.
 in `/design-schema` — retrofitting deletion onto a live dataset costs far more than choosing a
 period before the first record exists.
 
-Blocks: `ent-customer`, `ent-technician`
+Blocks: `ent-customer`, `ent-technician`, `AuditLog.source`
+
+### q-audit-source-trust — how many proxy hops sit in front of the API?
+
+`AuditLog.source` and the credential rate limiter both key on `req.ip`
+(`server/src/lib/requestSource.js`). `trust proxy` is not configured (`server/src/app.js`), so that
+value is the TCP peer.
+
+**Why:** `docs/delivery/PROFILE.md` records delivery mechanism, backend host and transport as
+**unknown — ask**. Behind a TLS terminator every client collapses to the terminator's address: the
+limiter's 10-attempt bucket becomes global, and every audit entry attributes every failure to one
+value. The fix is a validated hop count in `src/config/env.js` and `app.set('trust proxy', …)`, but
+the count is a deployment fact, not a default — and `trust proxy: true` is actively unsafe, because
+`X-Forwarded-For` then becomes client-controlled and an attacker can both evade the limiter and
+write chosen strings into an append-only column.
+
+Blocks: `AuditLog.source` attribution, `BE-01-02 AC-3` being provable in production
 
 ---
 
