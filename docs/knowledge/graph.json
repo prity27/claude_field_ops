@@ -8,7 +8,10 @@
       "path": "docs/knowledge/sources/2026-08-19-interview.md",
       "kind": "interview",
       "date": "2026-08-19",
-      "participants": ["project owner", "Claude (/ingest-knowledge interview mode)"],
+      "participants": [
+        "project owner",
+        "Claude (/ingest-knowledge interview mode)"
+      ],
       "authority": "medium"
     }
   ],
@@ -19,7 +22,13 @@
       "name": "Dispatcher",
       "description": "Schedules and dispatches work. Full visibility of every job.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "2.1-2.2", "quote": "A dispatcher has full visibility of all jobs. They create jobs, schedule them against a technician and a time slot, and dispatch them." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "2.1-2.2",
+          "quote": "A dispatcher has full visibility of all jobs. They create jobs, schedule them against a technician and a time slot, and dispatch them."
+        }
+      ]
     },
     {
       "id": "act-technician",
@@ -27,7 +36,13 @@
       "name": "Technician",
       "description": "Performs the work on site. Sees only jobs assigned to them.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "2.3", "quote": "A technician sees only the jobs assigned to them. They cannot see another technician's jobs." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "2.3",
+          "quote": "A technician sees only the jobs assigned to them. They cannot see another technician's jobs."
+        }
+      ]
     },
     {
       "id": "ent-customer",
@@ -35,15 +50,46 @@
       "name": "Customer",
       "description": "The party the work is done for. A record the dispatcher maintains, not an account holder.",
       "attributes": [
-        { "name": "name", "type": "string", "required": true, "confidence": "implied" },
-        { "name": "siteAddress", "type": "string", "required": true, "confidence": "implied", "classification": "PII" },
-        { "name": "contactPhone", "type": "string", "required": false, "confidence": "implied", "classification": "PII" },
-        { "name": "contactEmail", "type": "string", "required": false, "confidence": "implied", "classification": "PII" }
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "confidence": "implied"
+        },
+        {
+          "name": "siteAddress",
+          "type": "string",
+          "required": true,
+          "confidence": "implied",
+          "classification": "PII"
+        },
+        {
+          "name": "contactPhone",
+          "type": "string",
+          "required": false,
+          "confidence": "implied",
+          "classification": "PII"
+        },
+        {
+          "name": "contactEmail",
+          "type": "string",
+          "required": false,
+          "confidence": "implied",
+          "classification": "PII"
+        }
       ],
       "confidence": "stated",
       "sources": [
-        { "id": "src-interview-1", "loc": "1.1", "quote": "Customers have jobs that need doing at their site" },
-        { "id": "src-interview-1", "loc": "2.4", "quote": "A customer is a record the dispatcher maintains, not an account." }
+        {
+          "id": "src-interview-1",
+          "loc": "1.1",
+          "quote": "Customers have jobs that need doing at their site"
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "2.4",
+          "quote": "A customer is a record the dispatcher maintains, not an account."
+        }
       ]
     },
     {
@@ -52,12 +98,35 @@
       "name": "Technician",
       "description": "The persisted record behind the technician actor. Assignable to time slots.",
       "attributes": [
-        { "name": "name", "type": "string", "required": true, "confidence": "implied", "classification": "PII" },
-        { "name": "email", "type": "string", "required": true, "confidence": "implied", "classification": "PII" },
-        { "name": "active", "type": "boolean", "required": true, "confidence": "assumed" }
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "confidence": "implied",
+          "classification": "PII"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true,
+          "confidence": "implied",
+          "classification": "PII"
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "required": true,
+          "confidence": "assumed"
+        }
       ],
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "2.1", "quote": "Two roles log in: dispatcher and technician." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "2.1",
+          "quote": "Two roles log in: dispatcher and technician."
+        }
+      ]
     },
     {
       "id": "ent-job",
@@ -65,29 +134,149 @@
       "name": "Job",
       "description": "A unit of field-service work at a customer site. The centre of the domain.",
       "attributes": [
-        { "name": "customer", "type": "ref:Customer", "required": true, "confidence": "stated" },
-        { "name": "description", "type": "string", "required": true, "confidence": "implied" },
-        { "name": "status", "type": "enum", "values": ["raised", "scheduled", "dispatched", "in_progress", "completed", "invoiced", "cancelled"], "required": true, "confidence": "stated" },
-        { "name": "completionNotes", "type": "string", "required": false, "confidence": "stated" },
-        { "name": "cancelledReason", "type": "string", "required": false, "confidence": "assumed" }
+        {
+          "name": "customer",
+          "type": "ref:Customer",
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": true,
+          "confidence": "implied"
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "values": [
+            "raised",
+            "scheduled",
+            "dispatched",
+            "in_progress",
+            "completed",
+            "invoiced",
+            "cancelled"
+          ],
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "completionNotes",
+          "type": "string",
+          "required": false,
+          "confidence": "stated"
+        },
+        {
+          "name": "cancelledReason",
+          "type": "string",
+          "required": false,
+          "confidence": "assumed"
+        },
+        {
+          "name": "reopenedReason",
+          "type": "string",
+          "required": false,
+          "confidence": "stated"
+        },
+        {
+          "name": "reopenedBy",
+          "type": "ref:User",
+          "required": false,
+          "confidence": "stated"
+        },
+        {
+          "name": "reopenedAt",
+          "type": "datetime",
+          "required": false,
+          "confidence": "implied"
+        }
       ],
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "3.1", "quote": "A job moves through: raised → scheduled → dispatched → in_progress → completed → invoiced." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "3.1",
+          "quote": "A job moves through: raised → scheduled → dispatched → in_progress → completed → invoiced."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "8.3",
+          "quote": "with a recorded reason and actor"
+        }
+      ]
     },
     {
       "id": "ent-assignment",
       "type": "entity",
       "name": "Assignment",
-      "description": "Binds one job to one technician for one time window. The record the double-booking rule is enforced against.",
+      "description": "Binds one job to one technician for one fixed slot on one date. Uniqueness of the active assignment is what enforces no-double-booking.",
       "attributes": [
-        { "name": "job", "type": "ref:Job", "required": true, "confidence": "stated" },
-        { "name": "technician", "type": "ref:Technician", "required": true, "confidence": "stated" },
-        { "name": "startsAt", "type": "datetime", "required": true, "confidence": "implied" },
-        { "name": "endsAt", "type": "datetime", "required": true, "confidence": "implied" }
+        {
+          "name": "job",
+          "type": "ref:Job",
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "technician",
+          "type": "ref:Technician",
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "date",
+          "type": "date",
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "slot",
+          "type": "enum",
+          "values": [
+            "morning",
+            "afternoon",
+            "evening"
+          ],
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "values": [
+            "active",
+            "superseded"
+          ],
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "supersededAt",
+          "type": "datetime",
+          "required": false,
+          "confidence": "implied"
+        }
       ],
-      "confidence": "implied",
-      "sources": [{ "id": "src-interview-1", "loc": "4.1-4.2", "quote": "One technician per job. One job per technician per time slot." }],
-      "note": "The entity is implied, not stated — the interview describes the rule, not the record that enforces it. Its shape depends on q-slot-shape."
+      "confidence": "stated",
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "4.1-4.2",
+          "quote": "One technician per job. One job per technician per time slot."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "8.1",
+          "quote": "An assignment is (technician, date, slot) where slot is one of morning, afternoon, evening."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "8.2",
+          "quote": "the previous assignment is not overwritten: it is marked superseded and a new active assignment is created"
+        }
+      ],
+      "note": "A job occupies exactly one slot; spanning consecutive slots was considered and not chosen (8.1)."
     },
     {
       "id": "ent-invoice",
@@ -95,16 +284,59 @@
       "name": "Invoice",
       "description": "The billing record produced from a completed job.",
       "attributes": [
-        { "name": "job", "type": "ref:Job", "required": true, "confidence": "stated" },
-        { "name": "customer", "type": "ref:Customer", "required": true, "confidence": "implied" },
-        { "name": "total", "type": "decimal", "required": true, "confidence": "stated" },
-        { "name": "status", "type": "enum", "values": ["unpaid", "paid"], "required": true, "confidence": "stated" },
-        { "name": "issuedAt", "type": "datetime", "required": true, "confidence": "implied" }
+        {
+          "name": "job",
+          "type": "ref:Job",
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "customer",
+          "type": "ref:Customer",
+          "required": true,
+          "confidence": "implied"
+        },
+        {
+          "name": "total",
+          "type": "decimal",
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "values": [
+            "unpaid",
+            "paid",
+            "void"
+          ],
+          "required": true,
+          "confidence": "stated"
+        },
+        {
+          "name": "issuedAt",
+          "type": "datetime",
+          "required": true,
+          "confidence": "implied"
+        }
       ],
       "confidence": "stated",
       "sources": [
-        { "id": "src-interview-1", "loc": "5.2", "quote": "A completed job produces an invoice record with line items and a total." },
-        { "id": "src-interview-1", "loc": "5.3", "quote": "An invoice can be marked paid." }
+        {
+          "id": "src-interview-1",
+          "loc": "5.2",
+          "quote": "A completed job produces an invoice record with line items and a total."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "5.3",
+          "quote": "An invoice can be marked paid."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "8.3",
+          "quote": "If the job was already invoiced, the invoice is voided first"
+        }
       ]
     },
     {
@@ -113,23 +345,57 @@
       "name": "InvoiceLine",
       "description": "One billable item on an invoice.",
       "attributes": [
-        { "name": "description", "type": "string", "required": true, "confidence": "implied" },
-        { "name": "quantity", "type": "number", "required": true, "confidence": "implied" },
-        { "name": "unitPrice", "type": "decimal", "required": true, "confidence": "implied" }
+        {
+          "name": "description",
+          "type": "string",
+          "required": true,
+          "confidence": "implied"
+        },
+        {
+          "name": "quantity",
+          "type": "number",
+          "required": true,
+          "confidence": "implied"
+        },
+        {
+          "name": "unitPrice",
+          "type": "decimal",
+          "required": true,
+          "confidence": "implied"
+        }
       ],
       "confidence": "implied",
-      "sources": [{ "id": "src-interview-1", "loc": "5.2", "quote": "an invoice record with line items and a total" }],
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "5.2",
+          "quote": "an invoice record with line items and a total"
+        }
+      ],
       "note": "Line items were stated; their fields were not. Every attribute here is implied and needs confirmation before /design-schema fixes them."
     },
     {
       "id": "proc-job-lifecycle",
       "type": "process",
       "name": "Job lifecycle",
-      "description": "Ordered state machine. raised → scheduled → dispatched → in_progress → completed → invoiced, with cancelled reachable from any state before completed. Dispatcher drives the first three transitions; technician drives in_progress and completed; invoiced is a billing run, not a human action.",
+      "description": "Ordered state machine. raised → scheduled → dispatched → in_progress → completed → invoiced, with cancelled reachable from any state before completed. Dispatcher drives the first three transitions; technician drives in_progress and completed; invoiced is a billing run, not a human action. A completed job may be REOPENED back to in_progress by a dispatcher only, with a recorded reason and actor; if the job was already invoiced, its invoice must be voided first. Reopening is distinct from cancelling — a completed job still cannot be cancelled.",
       "confidence": "stated",
       "sources": [
-        { "id": "src-interview-1", "loc": "3.1-3.3", "quote": "in_progress — the technician starts it, on site. completed — the technician closes it, with notes." },
-        { "id": "src-interview-1", "loc": "3.4", "quote": "The transitions are ordered. A job does not skip from raised to in_progress." }
+        {
+          "id": "src-interview-1",
+          "loc": "3.1-3.3",
+          "quote": "in_progress — the technician starts it, on site. completed — the technician closes it, with notes."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "3.4",
+          "quote": "The transitions are ordered. A job does not skip from raised to in_progress."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "8.3",
+          "quote": "A dispatcher can move a completed job back to in_progress with a recorded reason and actor."
+        }
       ]
     },
     {
@@ -138,7 +404,13 @@
       "name": "Assign a technician to a job",
       "description": "Dispatcher selects a technician and a time window; the system rejects the assignment if it overlaps an existing assignment for that technician; on success the job becomes scheduled. Multi-step write: create the assignment and advance the job status.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "4.2-4.3", "quote": "An assignment that overlaps an existing assignment for that technician must be rejected, not warned about." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "4.2-4.3",
+          "quote": "An assignment that overlaps an existing assignment for that technician must be rejected, not warned about."
+        }
+      ]
     },
     {
       "id": "proc-invoice-generation",
@@ -146,18 +418,38 @@
       "name": "Generate an invoice from a completed job",
       "description": "A completed job produces an invoice with lines and a total, and the job moves to invoiced. Multi-step write across two collections.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "5.2", "quote": "A completed job produces an invoice record with line items and a total." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "5.2",
+          "quote": "A completed job produces an invoice record with line items and a total."
+        }
+      ]
     },
     {
       "id": "con-no-double-booking",
       "type": "constraint",
       "name": "A technician cannot be double-booked",
-      "description": "No two assignments for the same technician may overlap in time. Enforcement must be atomic: two dispatchers assigning the same technician to overlapping windows concurrently must not both succeed. A read-then-write check alone does not satisfy this.",
+      "description": "No two ACTIVE assignments may share (technician, date, slot). Enforced by a unique partial index on active assignments, so concurrency is resolved by the database: the second concurrent write fails on the duplicate key and the service translates that into 409. A superseded assignment must NOT block the slot, which is why the index is partial rather than plain.",
       "confidence": "stated",
       "sources": [
-        { "id": "src-interview-1", "loc": "4.2", "quote": "a technician cannot be double-booked" },
-        { "id": "src-interview-1", "loc": "4.3", "quote": "Two dispatchers assigning the same technician to overlapping slots at the same moment must not both succeed." }
-      ]
+        {
+          "id": "src-interview-1",
+          "loc": "4.2",
+          "quote": "a technician cannot be double-booked"
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "4.3",
+          "quote": "Two dispatchers assigning the same technician to overlapping slots at the same moment must not both succeed."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "8.1",
+          "quote": "Double-booking becomes a unique index on (technician, date, slot) ... The service catches that and returns 409."
+        }
+      ],
+      "enforcement": "unique partial index on (technician, date, slot) where status = 'active'"
     },
     {
       "id": "con-technician-scope",
@@ -165,17 +457,36 @@
       "name": "A technician may only see and act on their own jobs",
       "description": "Object-level authorization. Every read and write on a job by a technician actor must be scoped to assignments belonging to that technician. This is the project's primary IDOR surface.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "2.3", "quote": "A technician sees only the jobs assigned to them. They cannot see another technician's jobs." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "2.3",
+          "quote": "A technician sees only the jobs assigned to them. They cannot see another technician's jobs."
+        }
+      ]
     },
     {
       "id": "con-ordered-transitions",
       "type": "constraint",
       "name": "Job transitions are ordered and role-gated",
-      "description": "A job may not skip states, and each transition is permitted only to the role that owns it. A completed job cannot be cancelled.",
+      "description": "A job may not skip states, and each transition is permitted only to the role that owns it. A completed job cannot be cancelled. Reopening a completed job is permitted to the dispatcher only; a technician cannot reopen.",
       "confidence": "stated",
       "sources": [
-        { "id": "src-interview-1", "loc": "3.4", "quote": "The transitions are ordered. A job does not skip from raised to in_progress." },
-        { "id": "src-interview-1", "loc": "3.2", "quote": "A completed job cannot be cancelled." }
+        {
+          "id": "src-interview-1",
+          "loc": "3.4",
+          "quote": "The transitions are ordered. A job does not skip from raised to in_progress."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "3.2",
+          "quote": "A completed job cannot be cancelled."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "8.3",
+          "quote": "A technician cannot reopen."
+        }
       ]
     },
     {
@@ -184,7 +495,13 @@
       "name": "Customers do not log in",
       "description": "Customers are records, not accounts. Jobs are raised by the dispatcher on their behalf. Settled — do not re-litigate.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "2.4", "quote": "Customers do not log in." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "2.4",
+          "quote": "Customers do not log in."
+        }
+      ]
     },
     {
       "id": "dec-two-roles",
@@ -192,7 +509,13 @@
       "name": "Exactly two roles",
       "description": "Dispatcher and technician. No admin role, no customer role.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "2.1", "quote": "Two roles log in: dispatcher and technician." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "2.1",
+          "quote": "Two roles log in: dispatcher and technician."
+        }
+      ]
     },
     {
       "id": "ng-payments",
@@ -200,7 +523,13 @@
       "name": "Payment processing",
       "description": "No payment provider, no card processing. An invoice is marked paid by a human.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "5.4", "quote": "Explicitly not in scope: any payment provider or card processing, PDF generation, and tax calculation." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "5.4",
+          "quote": "Explicitly not in scope: any payment provider or card processing, PDF generation, and tax calculation."
+        }
+      ]
     },
     {
       "id": "ng-customer-portal",
@@ -208,7 +537,13 @@
       "name": "Customer portal",
       "description": "No customer-facing login or self-service job raising.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "6.1", "quote": "No customer login and no customer portal." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "6.1",
+          "quote": "No customer login and no customer portal."
+        }
+      ]
     },
     {
       "id": "ng-pdf-tax",
@@ -216,7 +551,13 @@
       "name": "PDF invoices and tax calculation",
       "description": "Invoices are records in the system only.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "5.4", "quote": "PDF generation, and tax calculation" }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "5.4",
+          "quote": "PDF generation, and tax calculation"
+        }
+      ]
     },
     {
       "id": "ng-mobile-app",
@@ -224,79 +565,269 @@
       "name": "Native mobile application",
       "description": "Technicians use the web client.",
       "confidence": "stated",
-      "sources": [{ "id": "src-interview-1", "loc": "6.3", "quote": "No mobile application — technicians use the web client." }]
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "6.3",
+          "quote": "No mobile application — technicians use the web client."
+        }
+      ]
     }
   ],
   "relations": [
-    { "id": "rel-customer-jobs", "from": "ent-customer", "to": "ent-job", "type": "has-many", "cardinality": "1:N", "confidence": "stated", "sources": [{ "id": "src-interview-1", "loc": "1.1", "quote": "Customers have jobs that need doing at their site" }] },
-    { "id": "rel-job-assignment", "from": "ent-job", "to": "ent-assignment", "type": "has-one", "cardinality": "1:1", "confidence": "implied", "sources": [{ "id": "src-interview-1", "loc": "4.1", "quote": "One technician per job." }], "note": "1:1 assumes a job is never reassigned. If q-reassignment says it can be, this becomes 1:N with one active assignment — a different schema." },
-    { "id": "rel-technician-assignments", "from": "ent-technician", "to": "ent-assignment", "type": "has-many", "cardinality": "1:N", "confidence": "stated", "sources": [{ "id": "src-interview-1", "loc": "4.2", "quote": "One job per technician per time slot" }] },
-    { "id": "rel-job-invoice", "from": "ent-job", "to": "ent-invoice", "type": "has-one", "cardinality": "1:1", "confidence": "implied", "sources": [{ "id": "src-interview-1", "loc": "5.2", "quote": "A completed job produces an invoice record" }] },
-    { "id": "rel-invoice-lines", "from": "ent-invoice", "to": "ent-invoice-line", "type": "has-many", "cardinality": "1:N", "confidence": "stated", "sources": [{ "id": "src-interview-1", "loc": "5.2", "quote": "an invoice record with line items and a total" }] }
+    {
+      "id": "rel-customer-jobs",
+      "from": "ent-customer",
+      "to": "ent-job",
+      "type": "has-many",
+      "cardinality": "1:N",
+      "confidence": "stated",
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "1.1",
+          "quote": "Customers have jobs that need doing at their site"
+        }
+      ]
+    },
+    {
+      "id": "rel-job-assignment",
+      "from": "ent-job",
+      "to": "ent-assignment",
+      "type": "has-many",
+      "cardinality": "1:N",
+      "confidence": "stated",
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "4.1",
+          "quote": "One technician per job."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "8.2",
+          "quote": "Job ↔ Assignment becomes 1:N with exactly one active."
+        }
+      ],
+      "note": "Exactly one assignment per job has status 'active'; the rest are superseded history."
+    },
+    {
+      "id": "rel-technician-assignments",
+      "from": "ent-technician",
+      "to": "ent-assignment",
+      "type": "has-many",
+      "cardinality": "1:N",
+      "confidence": "stated",
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "4.2",
+          "quote": "One job per technician per time slot"
+        }
+      ]
+    },
+    {
+      "id": "rel-job-invoice",
+      "from": "ent-job",
+      "to": "ent-invoice",
+      "type": "has-one",
+      "cardinality": "1:1",
+      "confidence": "implied",
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "5.2",
+          "quote": "A completed job produces an invoice record"
+        }
+      ]
+    },
+    {
+      "id": "rel-invoice-lines",
+      "from": "ent-invoice",
+      "to": "ent-invoice-line",
+      "type": "has-many",
+      "cardinality": "1:N",
+      "confidence": "stated",
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "5.2",
+          "quote": "an invoice record with line items and a total"
+        }
+      ]
+    }
   ],
   "openQuestions": [
     {
       "id": "q-slot-shape",
       "question": "What is a time slot — a fixed grid (hourly, or morning/afternoon), or an arbitrary start and end datetime chosen per job?",
       "why": "Decides Assignment's fields and how the overlap check is expressed. A fixed grid makes double-booking a unique index on (technician, slot); arbitrary windows make it a range-overlap query that a unique index cannot enforce, which changes the atomicity strategy for con-no-double-booking.",
-      "blocks": ["ent-assignment", "con-no-double-booking", "proc-assign-technician"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "ent-assignment",
+        "con-no-double-booking",
+        "proc-assign-technician"
+      ],
+      "status": "answered",
+      "answer": "Fixed grid. An assignment is (technician, date, slot) with slot in {morning, afternoon, evening}. A job occupies exactly one slot. No-double-booking is enforced by a unique partial index on active assignments; the duplicate-key failure becomes a 409.",
+      "answeredBy": "project owner",
+      "answeredOn": "2026-08-19",
+      "answerSource": {
+        "id": "src-interview-1",
+        "loc": "8.1",
+        "quote": "see digest section"
+      }
     },
     {
       "id": "q-reassignment",
       "question": "Can a dispatched or in-progress job be reassigned to a different technician, and what happens to the original assignment — replaced, or kept as history?",
       "why": "Decides whether Job↔Assignment is 1:1 or 1:N with one active. Changes the schema, the overlap check and at least two stories.",
-      "blocks": ["rel-job-assignment", "ent-assignment"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "rel-job-assignment",
+        "ent-assignment"
+      ],
+      "status": "answered",
+      "answer": "Yes, with history. Job↔Assignment is 1:N with exactly one active assignment; reassigning marks the old one superseded and creates a new active one. Superseded assignments do not block a slot.",
+      "answeredBy": "project owner",
+      "answeredOn": "2026-08-19",
+      "answerSource": {
+        "id": "src-interview-1",
+        "loc": "8.2",
+        "quote": "see digest section"
+      }
     },
     {
       "id": "q-completion-requirements",
       "question": "Does completing a job require anything beyond notes — a photo, a customer signature, parts used, time on site?",
       "why": "Each addition is a required field and an acceptance criterion. Photos additionally mean file upload, which brings its own OWASP surface (size limits, content-type validation, storage location).",
-      "blocks": ["ent-job", "proc-job-lifecycle"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "ent-job",
+        "proc-job-lifecycle"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
     },
     {
       "id": "q-completed-correction",
       "question": "A completed job cannot be cancelled (3.2). What happens when a completed or invoiced job turns out to be wrong?",
       "why": "There is currently no correction path in the stated lifecycle. Without one, the first real mistake has no in-system remedy and someone edits the database by hand.",
-      "blocks": ["proc-job-lifecycle", "ent-invoice"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "proc-job-lifecycle",
+        "ent-invoice"
+      ],
+      "status": "answered",
+      "answer": "A dispatcher (not a technician) may reopen a completed job back to in_progress, recording a reason and actor. If the job was invoiced, its invoice is voided first. Cancelling a completed job remains forbidden.",
+      "answeredBy": "project owner",
+      "answeredOn": "2026-08-19",
+      "answerSource": {
+        "id": "src-interview-1",
+        "loc": "8.3",
+        "quote": "see digest section"
+      }
     },
     {
       "id": "q-invoice-pricing",
       "question": "Where do invoice line prices come from — typed by the dispatcher, a rate card, or derived from time on site and parts used?",
       "why": "Every attribute of InvoiceLine is currently 'implied'. A rate card is an entity nobody has mentioned; deriving from time on site depends on q-completion-requirements.",
-      "blocks": ["ent-invoice-line", "proc-invoice-generation"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "ent-invoice-line",
+        "proc-invoice-generation"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
     },
     {
       "id": "q-customer-deletion",
       "question": "Can a customer be deleted while they have open jobs, and can a job exist without a customer?",
       "why": "Decides required-ness and the delete strategy (block, cascade, or soft-delete). Getting it wrong orphans jobs.",
-      "blocks": ["ent-customer", "rel-customer-jobs"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "ent-customer",
+        "rel-customer-jobs"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
     },
     {
       "id": "q-technician-deactivation",
       "question": "How is a technician deactivated when they leave, and what happens to their future assignments?",
       "why": "The 'active' attribute on Technician is currently 'assumed' — nobody stated it. Deletion would orphan assignment history, so deactivation is likely, but that must be confirmed, and the unassignment of future work is a real workflow nobody has described.",
-      "blocks": ["ent-technician"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "ent-technician"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
     },
     {
       "id": "q-cancel-reason",
       "question": "Must a cancellation carry a reason, and who is allowed to cancel — dispatcher only, or the technician too?",
       "why": "The 'cancelledReason' attribute is 'assumed' and section 3.3 names an owner for every transition except cancellation.",
-      "blocks": ["ent-job", "con-ordered-transitions"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "ent-job",
+        "con-ordered-transitions"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
     },
     {
       "id": "q-pii-retention",
       "question": "What retention period and data residency apply to customer addresses and technician scheduling data?",
       "why": "Both are personal data. GDPR applicability is unresolved in PROFILE.md, and retention must be decided in /design-schema rather than after launch.",
-      "blocks": ["ent-customer", "ent-technician"],
-      "status": "open", "answer": null, "answeredBy": null, "answeredOn": null
+      "blocks": [
+        "ent-customer",
+        "ent-technician"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
+    },
+    {
+      "id": "q-slot-capacity",
+      "question": "Can a technician have more than one job in the same slot if the dispatcher explicitly overrides, or is the slot hard-limited to one job always?",
+      "why": "Decides whether the unique index is the whole rule or needs an override path. An override would mean the index cannot be the enforcement mechanism, which reverses the q-slot-shape decision.",
+      "blocks": [
+        "con-no-double-booking",
+        "ent-assignment"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
+    },
+    {
+      "id": "q-void-invoice-rules",
+      "question": "Who may void an invoice, must voiding carry a reason, and can a paid invoice be voided?",
+      "why": "Reopening an invoiced job voids its invoice (8.3), but nobody has said who else may void, whether a reason is required, or what happens to an invoice already marked paid. Voiding a paid invoice is a money-affecting action with no stated owner.",
+      "blocks": [
+        "ent-invoice",
+        "proc-invoice-generation"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
+    },
+    {
+      "id": "q-reopen-reinvoice",
+      "question": "After a reopened job is completed again, does it generate a new invoice automatically, and what links it to the voided one?",
+      "why": "The invoice generation process assumes a completed job has no prior invoice. Without an answer, a re-completed job either silently skips invoicing or creates an unlinked duplicate.",
+      "blocks": [
+        "proc-invoice-generation",
+        "ent-invoice"
+      ],
+      "status": "open",
+      "answer": null,
+      "answeredBy": null,
+      "answeredOn": null
     }
   ]
 }

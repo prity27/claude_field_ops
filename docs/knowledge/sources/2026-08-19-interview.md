@@ -101,3 +101,44 @@ have open jobs.
 personal data.
 
 7.7 How a technician is deactivated when they leave, and what happens to their future assignments.
+
+## 8. Follow-up answers — 2026-08-19, same day
+
+Answers to the open questions raised in §7, given by the project owner after reviewing the graph.
+These resolve q-slot-shape, q-reassignment and q-completed-correction.
+
+### 8.1 Time slots are a fixed grid
+
+A slot is not an arbitrary datetime range. An assignment is `(technician, date, slot)` where slot is
+one of `morning`, `afternoon`, `evening`.
+
+"Double-booking becomes a unique index on (technician, date, slot)" — the database enforces the
+invariant, and two dispatchers assigning the same technician to the same slot concurrently is
+resolved by the second write failing on the duplicate key. The service catches that and returns 409.
+
+A job occupies exactly one slot. Jobs spanning consecutive slots were considered and **not** chosen.
+
+### 8.2 Jobs can be reassigned, and the history is kept
+
+A dispatched or in-progress job can be moved to a different technician. The previous assignment is
+**not** overwritten: it is marked superseded and a new active assignment is created.
+
+"Job ↔ Assignment becomes 1:N with exactly one active."
+
+The reason given: technicians call in sick, and the history is what lets you answer "who was meant
+to do this". The uniqueness rule applies to active assignments only — a superseded assignment must
+not block the slot.
+
+### 8.3 A completed job can be reopened, by a dispatcher only
+
+"A dispatcher can move a completed job back to in_progress with a recorded reason and actor."
+
+A technician cannot reopen. If the job was already `invoiced`, **the invoice is voided first** —
+reopening an invoiced job without voiding its invoice is not permitted.
+
+This supersedes nothing in §3.2: a completed job still cannot be *cancelled*. Reopening is a
+distinct transition with a distinct owner.
+
+### 8.4 Team
+
+Experience level: **mixed**. Domain expertise was not stated.

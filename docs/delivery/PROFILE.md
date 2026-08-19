@@ -10,9 +10,9 @@ Last updated: 2026-08-19 · Updated by: Claude (detection) — human rows pendin
 
 | Field | Value |
 | --- | --- |
-| Experience level | **unknown** — ask |
-| Verbosity contract | pending, follows from experience level |
-| Domain expertise | **unknown** — ask |
+| Experience level | `mixed` *(asked, 2026-08-19)* |
+| Verbosity contract | **write for `mid`, and put the `junior` explanation in a collapsed "Why" note** |
+| Domain expertise | **unknown** — ask. Until answered, define every domain term before building on it |
 | Domain | field-service job scheduling (dispatch, technicians, time slots, invoicing) *(asked)* |
 
 **Verbosity contract** — how every later skill talks to this team:
@@ -39,8 +39,8 @@ Greenfield project: the three brownfield lists do not apply.
 | Field | Value |
 | --- | --- |
 | Working directory | `/home/claudesdd02/projects/fieldops/server` *(detected)* |
-| Git remote | **unknown** — no remote configured; see "What a human must do" |
-| Default branch | `main` *(detected)* |
+| Git remote | `https://github.com/prity27/claude_field_ops.git` *(detected 2026-08-19)* |
+| Default branch | `main`, tracking `origin/main` *(detected)* |
 | Branch convention | **unknown** — ask |
 | Stack family | Node *(detected — `package.json`)* |
 | Language / runtime | JavaScript ESM on Node >= 20 *(detected — `"type": "module"`, `engines.node`)*; running Node 24.18.0 |
@@ -58,7 +58,7 @@ Greenfield project: the three brownfield lists do not apply.
 | Field | Value |
 | --- | --- |
 | Working directory | `/home/claudesdd02/projects/fieldops/client` *(detected)* |
-| Git remote | same repository as the backend — monorepo |
+| Git remote | same repository as the backend — monorepo, `prity27/claude_field_ops` |
 | Default branch | `main` |
 | Stack family | React SPA *(detected)* |
 | Language / framework | JavaScript + JSX + React 18.3 *(detected — deliberately not TypeScript, `CLAUDE.md`)* |
@@ -116,14 +116,15 @@ after launch.
 
 ## What a human must do
 
-1. **Create the GitHub repository and add the remote** — `gh` is not installed on this machine, so
-   this cannot be automated from here:
-   ```bash
-   git remote add origin git@github.com:<owner>/fieldops.git
-   git push -u origin main
-   ```
-2. Answer the rows marked **unknown** above — team experience, branch convention, deployment,
+1. ~~Create the GitHub repository and add the remote.~~ **Done 2026-08-19** —
+   `https://github.com/prity27/claude_field_ops.git`, `main` tracking `origin/main`.
+2. Answer the rows still marked **unknown** above — team experience, branch convention, deployment,
    transport, and which compliance regimes apply.
+
+Note: `gh` is not installed on this machine, so anything needing the GitHub API — creating a PR,
+setting branch protection, adding Actions secrets — has to be done in the browser or after
+`sudo apt install gh && gh auth login`. `/deploy` will need those secrets to exist before its
+workflow runs green.
 
 ## Artefact locations
 
