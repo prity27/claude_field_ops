@@ -3,13 +3,19 @@ import * as auth from '../services/auth.service.js';
 import { validateBody } from '../middleware/validate.js';
 import { setAuthCookies, clearAuthCookies, REFRESH_COOKIE } from '../lib/cookies.js';
 import { config } from '../config/env.js';
+import { rateLimit } from '../middleware/rateLimit.js';
 
 export const authRouter = Router();
+
+// BE-01-02 AC-3. Applied to the credential-guessing surfaces only — login and the two reset
+// endpoints — rather than globally, so a legitimate client is never throttled for reading.
+const credentialLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10 });
 
 // These five are the only unauthenticated routes besides /health (BE-01-05 AC-2).
 
 authRouter.post(
   '/auth/login',
+  credentialLimiter,
   validateBody({
     email: { required: true, type: 'string', maxLength: 254 },
     password: { required: true, type: 'string', maxLength: 200 },
@@ -54,6 +60,7 @@ authRouter.post('/auth/logout', async (req, res, next) => {
 
 authRouter.post(
   '/auth/password-reset/request',
+  credentialLimiter,
   validateBody({ email: { required: true, type: 'string', maxLength: 254 } }),
   async (req, res, next) => {
     try {
@@ -69,6 +76,7 @@ authRouter.post(
 
 authRouter.post(
   '/auth/password-reset/complete',
+  credentialLimiter,
   validateBody({
     token: { required: true, type: 'string', maxLength: 200 },
     password: { required: true, type: 'string', minLength: 12, maxLength: 200 },
