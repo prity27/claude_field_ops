@@ -76,6 +76,19 @@
           "required": false,
           "confidence": "implied",
           "classification": "PII"
+        },
+        {
+          "name": "archived",
+          "type": "boolean",
+          "required": true,
+          "confidence": "stated",
+          "default": false
+        },
+        {
+          "name": "archivedAt",
+          "type": "datetime",
+          "required": false,
+          "confidence": "implied"
         }
       ],
       "confidence": "stated",
@@ -89,6 +102,11 @@
           "id": "src-interview-1",
           "loc": "2.4",
           "quote": "A customer is a record the dispatcher maintains, not an account."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "9.3",
+          "quote": "A customer is archived. Archiving is blocked while the customer has open jobs"
         }
       ]
     },
@@ -116,7 +134,13 @@
           "name": "active",
           "type": "boolean",
           "required": true,
-          "confidence": "assumed"
+          "confidence": "stated"
+        },
+        {
+          "name": "deactivatedAt",
+          "type": "datetime",
+          "required": false,
+          "confidence": "implied"
         }
       ],
       "confidence": "stated",
@@ -125,6 +149,11 @@
           "id": "src-interview-1",
           "loc": "2.1",
           "quote": "Two roles log in: dispatcher and technician."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "9.3",
+          "quote": "A technician is deactivated. On deactivation, their future active assignments are marked superseded and surfaced to the dispatcher for reassignment"
         }
       ]
     },
@@ -171,7 +200,8 @@
           "name": "cancelledReason",
           "type": "string",
           "required": false,
-          "confidence": "assumed"
+          "confidence": "stated",
+          "note": "Required whenever status is cancelled; null otherwise."
         },
         {
           "name": "reopenedReason",
@@ -190,6 +220,18 @@
           "type": "datetime",
           "required": false,
           "confidence": "implied"
+        },
+        {
+          "name": "cancelledBy",
+          "type": "ref:User",
+          "required": false,
+          "confidence": "stated"
+        },
+        {
+          "name": "cancelledAt",
+          "type": "datetime",
+          "required": false,
+          "confidence": "implied"
         }
       ],
       "confidence": "stated",
@@ -203,6 +245,11 @@
           "id": "src-interview-1",
           "loc": "8.3",
           "quote": "with a recorded reason and actor"
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "9.2",
+          "quote": "Only a dispatcher may cancel a job. A technician cannot. Cancelling records a reason and the actor."
         }
       ]
     },
@@ -430,7 +477,7 @@
       "id": "con-no-double-booking",
       "type": "constraint",
       "name": "A technician cannot be double-booked",
-      "description": "No two ACTIVE assignments may share (technician, date, slot). Enforced by a unique partial index on active assignments, so concurrency is resolved by the database: the second concurrent write fails on the duplicate key and the service translates that into 409. A superseded assignment must NOT block the slot, which is why the index is partial rather than plain.",
+      "description": "No two ACTIVE assignments may share (technician, date, slot). Enforced by a unique partial index on active assignments, so concurrency is resolved by the database: the second concurrent write fails on the duplicate key and the service translates that into 409. A superseded assignment must NOT block the slot, which is why the index is partial rather than plain. There is no override: one job per technician per slot is absolute (9.1).",
       "confidence": "stated",
       "sources": [
         {
@@ -447,6 +494,11 @@
           "id": "src-interview-1",
           "loc": "8.1",
           "quote": "Double-booking becomes a unique index on (technician, date, slot) ... The service catches that and returns 409."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "9.1",
+          "quote": "No, hard limit. A dispatcher cannot override and put two jobs in one technician's slot under any circumstance."
         }
       ],
       "enforcement": "unique partial index on (technician, date, slot) where status = 'active'"
@@ -469,7 +521,7 @@
       "id": "con-ordered-transitions",
       "type": "constraint",
       "name": "Job transitions are ordered and role-gated",
-      "description": "A job may not skip states, and each transition is permitted only to the role that owns it. A completed job cannot be cancelled. Reopening a completed job is permitted to the dispatcher only; a technician cannot reopen.",
+      "description": "A job may not skip states, and each transition is permitted only to the role that owns it. A completed job cannot be cancelled. Reopening a completed job is permitted to the dispatcher only; a technician cannot reopen. Cancellation is dispatcher-only and requires a reason (9.2).",
       "confidence": "stated",
       "sources": [
         {
@@ -486,6 +538,11 @@
           "id": "src-interview-1",
           "loc": "8.3",
           "quote": "A technician cannot reopen."
+        },
+        {
+          "id": "src-interview-1",
+          "loc": "9.2",
+          "quote": "The reason is required, not optional"
         }
       ]
     },
@@ -570,6 +627,20 @@
           "id": "src-interview-1",
           "loc": "6.3",
           "quote": "No mobile application — technicians use the web client."
+        }
+      ]
+    },
+    {
+      "id": "con-soft-delete",
+      "type": "constraint",
+      "name": "Customers and technicians are never hard-deleted",
+      "description": "A customer is archived, blocked while any job of theirs is not completed, invoiced or cancelled. A technician is deactivated, and their future active assignments are superseded and surfaced to the dispatcher for reassignment. Archived customers and deactivated technicians must not appear in selection lists for new work, but must still resolve on existing records.",
+      "confidence": "stated",
+      "sources": [
+        {
+          "id": "src-interview-1",
+          "loc": "9.3",
+          "quote": "Neither is ever hard-deleted, because invoicing needs the history."
         }
       ]
     }
@@ -747,10 +818,10 @@
         "ent-customer",
         "rel-customer-jobs"
       ],
-      "status": "open",
-      "answer": null,
-      "answeredBy": null,
-      "answeredOn": null
+      "status": "answered",
+      "answer": "Customers are archived, never deleted. Archiving is blocked while the customer has any job not in completed, invoiced or cancelled. Archived customers do not appear in selection lists but still resolve on existing records.",
+      "answeredBy": "project owner",
+      "answeredOn": "2026-08-19"
     },
     {
       "id": "q-technician-deactivation",
@@ -759,10 +830,10 @@
       "blocks": [
         "ent-technician"
       ],
-      "status": "open",
-      "answer": null,
-      "answeredBy": null,
-      "answeredOn": null
+      "status": "answered",
+      "answer": "Technicians are deactivated, never deleted. Future active assignments are superseded and surfaced to the dispatcher for reassignment. Deactivated technicians do not appear in selection lists but still resolve on existing records.",
+      "answeredBy": "project owner",
+      "answeredOn": "2026-08-19"
     },
     {
       "id": "q-cancel-reason",
@@ -772,10 +843,10 @@
         "ent-job",
         "con-ordered-transitions"
       ],
-      "status": "open",
-      "answer": null,
-      "answeredBy": null,
-      "answeredOn": null
+      "status": "answered",
+      "answer": "Dispatcher only; a technician cannot cancel. A reason is required and recorded with the actor and timestamp, mirroring the reopen rule.",
+      "answeredBy": "project owner",
+      "answeredOn": "2026-08-19"
     },
     {
       "id": "q-pii-retention",
@@ -798,10 +869,10 @@
         "con-no-double-booking",
         "ent-assignment"
       ],
-      "status": "open",
-      "answer": null,
-      "answeredBy": null,
-      "answeredOn": null
+      "status": "answered",
+      "answer": "No override. One job per technician per slot is absolute, so the unique partial index remains the sole enforcement mechanism and a duplicate key becomes a 409.",
+      "answeredBy": "project owner",
+      "answeredOn": "2026-08-19"
     },
     {
       "id": "q-void-invoice-rules",

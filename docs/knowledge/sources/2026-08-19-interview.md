@@ -142,3 +142,37 @@ distinct transition with a distinct owner.
 ### 8.4 Team
 
 Experience level: **mixed**. Domain expertise was not stated.
+
+## 9. Follow-up answers — 2026-08-19, during epic planning
+
+Given by the project owner while agreeing the epic cut. Resolves q-slot-capacity, q-cancel-reason,
+q-customer-deletion and q-technician-deactivation.
+
+### 9.1 One job per slot is a hard limit
+
+"No, hard limit." A dispatcher cannot override and put two jobs in one technician's slot under any
+circumstance.
+
+This confirms and preserves the §8.1 decision: the unique partial index **is** the rule. No
+application-level concurrency handling is required beyond translating the duplicate-key failure
+into a 409.
+
+### 9.2 Cancellation is dispatcher-only and requires a reason
+
+Only a dispatcher may cancel a job. A technician cannot. Cancelling records a reason and the
+actor, exactly as reopening does (§8.3).
+
+The reason is **required**, not optional — "an optional reason field is one nobody fills in, and
+the cancellation history becomes useless within a month."
+
+### 9.3 Customers and technicians are soft-deleted, never removed
+
+Neither is ever hard-deleted, because invoicing needs the history.
+
+- A **customer** is archived. Archiving is **blocked while the customer has open jobs** — open
+  meaning any status other than `completed`, `invoiced` or `cancelled`.
+- A **technician** is deactivated. On deactivation, their future `active` assignments are marked
+  superseded and **surfaced to the dispatcher for reassignment** rather than silently dropped.
+
+An archived customer and a deactivated technician must not appear in selection lists for new work,
+but must still resolve on existing records.
