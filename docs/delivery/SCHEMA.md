@@ -196,6 +196,18 @@ proposal, recorded so the gate can see the whole model — **they must not be bu
 **Money is a minor-unit integer, never a float.** `0.1 + 0.2 !== 0.3` in IEEE 754, and an invoice
 total that is off by a cent is a defect nobody can explain and everyone notices.
 
+### PasswordResetToken  *(added during BE-01, after validation)*
+
+**This entity did not exist when this document was validated on 2026-08-19.** It was added while
+building `BE-01-04`, which cannot be implemented without it. Recorded here rather than left only in
+code, because a schema document that silently drifts from the models is worse than none.
+
+`user` (→User, indexed), `tokenHash` (string, unique — the token itself is never stored),
+`expiresAt` (timestamp, **TTL index**), `usedAt` (timestamp, nullable — enforces single use),
+`createdAt`. Class: **secret**.
+
+Needs sign-off at the next gate, alongside `BE-01-09`.
+
 ### RefreshToken · AuditLog  *(proposed)*
 
 **RefreshToken** — `user` (→User, indexed), `tokenHash` (string, unique — the token itself is never

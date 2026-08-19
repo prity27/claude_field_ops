@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 export const AUDIT_ACTIONS = [
   'login.success',
   'login.failure',
+  'password.reset',
   'authorization.denied',
   'user.provisioned',
   'user.role_changed',

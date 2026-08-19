@@ -234,3 +234,38 @@ aspirational.
 **Estimate:** M
 **Notes:** the action list in AC-1 is drawn from the exceptional transitions this domain has —
 cancel (§9.2), reopen (§8.3) and void (§8.3). It grows as epics land.
+
+### BE-01-09 — CSRF protection on state-changing routes
+
+> **Added after this epic was approved.** It is a direct consequence of the token-storage
+> decision taken at the `/build-module` gate on 2026-08-19 — cookies are sent automatically by
+> the browser, so httpOnly storage trades an XSS risk for a CSRF one. It is built and working,
+> and it **needs sign-off** rather than being treated as approved scope.
+
+**As a** signed-in user
+**I want** another site to be unable to act on my behalf
+**So that** my session cookie is not a blank cheque
+
+**Source:** no graph source — a consequence of the httpOnly-cookie decision, build gate 2026-08-19.
+
+**Acceptance criteria**
+
+- **AC-1** Given any state-changing request (POST, PATCH, DELETE) with valid session cookies
+  When the `x-csrf-token` header is absent or does not match the `fo_csrf` cookie
+  Then the response is 403 `csrf_failed` and nothing is written
+
+- **AC-2** Given the header matches the cookie
+  Then the request proceeds
+
+- **AC-3** Given a safe method (GET, HEAD, OPTIONS)
+  Then no CSRF check applies
+
+- **AC-4** Given the CSRF cookie
+  Then it is **not** httpOnly — the client must read it to echo it — and it is not a credential
+  on its own
+
+**Estimate:** S
+**Notes:** `SameSite=Strict` already blocks most cross-site cookie sending; this is defence in
+depth. **Known gap:** `/auth/logout` and `/auth/refresh` sit ahead of the CSRF middleware because
+they precede `authenticate`, so a forged cross-site request can log a user out. Annoying rather
+than damaging, and it is a real gap — recorded, not hidden.
