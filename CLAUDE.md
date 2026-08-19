@@ -21,12 +21,21 @@ npm workspaces from the root. Run `npm install` once at the root, never inside a
 | Command | Does | Run from |
 | --- | --- | --- |
 | `npm run dev` | both servers — API on `:4000`, client on `:5173` | root |
-| `npm run gate` | the full gate: lint both workspaces, build the client | root |
+| `npm run gate` | the full gate: lint both workspaces, run the server suite, build the client | root |
 | `npm run lint --workspace=server` | server lint only | root |
-| `npm test` | **fails by design** — no test runner is configured yet | root |
+| `npm test --workspace=server` | the server suite — `node:test`, one AC per test name | root |
+| `npm test` | still **fails** — it also runs the client, which has no runner | root |
 
-`npm test` exiting non-zero is the honest state, not a bug. `/write-tests` stands the runner up when
-the first epic needs it; until then nothing should claim this project has tests.
+The server runner was stood up by `/write-tests` on 2026-08-19: Node's built-in `node:test` with
+`supertest` and an ephemeral single-node replica set, entered through `server/test/run.js`. Every
+test is named for the acceptance criterion it proves, so `/validate-delivery` can grep for an AC id
+instead of forming an opinion. **The client still has no runner** — no approved frontend epic has
+code yet — so root `npm test` still exits non-zero, and that half remains the honest state.
+
+`npm run gate` now runs the server suite. As of 2026-08-19 the gate is **red**, with one failing
+test: `BE-01-02 AC-3` requires a failed login to be logged with its source, and the audit entry
+records no source. That is an unmet criterion, not a broken harness — do not fix it by weakening
+the test.
 
 There is no build step on the server. It runs `node src/index.js` directly — do not add a `dist/`
 or a transpile step without changing `docs/delivery/PROFILE.md` in the same commit.
@@ -85,7 +94,7 @@ Rules that follow from that:
 
 Do not report these as defects — they are recorded decisions, current as of the profile's date:
 
-- No test runner. See above.
+- No test runner **on the client**. See above; the server has one.
 - No authentication yet. `POST`/`PATCH` routes do not exist yet either; auth arrives with the
   baseline epic, before the first write endpoint. A write route merged without an auth check is a
   blocking defect, not a follow-up.

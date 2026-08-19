@@ -5,6 +5,7 @@
 > When a detected value goes stale, re-run `/project-setup` rather than hand-editing.
 
 Last updated: 2026-08-19 · Updated by: Claude (detection) — human rows pending
+> Test-runner and gate rows updated by `/write-tests`, 2026-08-19.
 
 ## Team
 
@@ -49,8 +50,8 @@ Greenfield project: the three brownfield lists do not apply.
 | Build step | **none** — runs `node src/index.js` directly *(detected)* |
 | Database | MongoDB via Mongoose 8.5 *(detected)*. **Must run as a replica set** — decided at the `/design-schema` gate 2026-08-19, because transactions are required and a standalone `mongod` cannot provide them |
 | Migrations | **none — schema lives only in the Mongoose models** *(detected)*. `INF-00-08` is the decision story for whether that stays |
-| Gate commands | `npm run lint --workspace=server` — **ran 2026-08-19, clean** |
-| Test runner | **none configured.** `npm test` exits 1 by design — **ran 2026-08-19, fails as expected** |
+| Gate commands | `npm run lint --workspace=server && npm test --workspace=server` — **ran 2026-08-19; lint clean, suite 85/86** |
+| Test runner | **`node:test`** (Node 24 built-in) with `supertest` and `mongodb-memory-server-core` *(stood up by `/write-tests`, 2026-08-19)*. Chosen over Vitest and Jest at that gate because the server has no build step and the built-in runner needs no config or transform. Entry point `server/test/run.js`; tests in `server/test/`, named for the AC they prove. **Ran 2026-08-19: 86 tests, 85 pass, 1 fail** — the failure is a real unmet criterion (`BE-01-02 AC-3`), not a broken harness |
 | Entry point | `server/src/index.js` *(detected — `package.json` `main` and `start` agree)* |
 
 ## Frontend
@@ -68,10 +69,16 @@ Greenfield project: the three brownfield lists do not apply.
 | UI system | **none** — unstyled semantic HTML *(detected)*. Open decision |
 | Data fetching | `fetch` wrapper at `client/src/lib/api.js` *(detected)*; `CLAUDE.md` forbids bare `fetch` in components |
 | Gate commands | `npm run lint --workspace=client && npm run build --workspace=client` — **ran 2026-08-19, clean; build emits `dist/` in 1.6s** |
-| Test runner | **none configured.** `npm test` exits 1 by design |
+| Test runner | **none configured.** `npm test` exits 1 by design. Deliberate as of 2026-08-19: `/write-tests` scoped its first pass to the server, because `01-identity-and-access-frontend.md` is still `status: draft` and no approved frontend epic has code — a runner installed now would test nothing |
 
-Root shortcut, verified 2026-08-19: **`npm run gate` runs every gate above and exits 0.** Later
-skills should use this single command.
+Root shortcut: **`npm run gate` runs every gate above.** Later skills should use this single
+command. As of 2026-08-19 it **exits 1**, and the only reason is `BE-01-02 AC-3` — failed login
+attempts are audited without the source of the attempt. That is a red gate reporting an unmet
+criterion, which is what it is for; it was green on 2026-08-19 before the suite existed to test it.
+
+Note that root **`npm test`** still exits 1 for a second, unrelated reason: it runs the client
+workspace too, whose `test` script is the placeholder that exits 1. Use `npm test --workspace=server`
+for the suite that exists.
 
 ## Deployment
 
@@ -97,8 +104,8 @@ skills should use this single command.
 | Authorization model | **unknown** — a decision for `/write-stories`; roles are implied by the domain (dispatcher, technician, customer) but nothing has decided them |
 | Secret management | `.env` git-ignored, `.env.example` committed with placeholders; all reads centralised in `server/src/config/env.js` and validated at boot *(detected)*. **Verified: no `.env` is tracked, and no credential appears in a tracked file** |
 | Transport | **unknown** — no TLS termination exists locally; a deployment decision |
-| Audit logging | **none.** `console.error` on 500 only *(detected — `server/src/middleware/errorHandler.js:24`)* |
-| Known exceptions | `npm test` exits 1 (no runner yet); no auth (no write routes yet); no migrations (Mongoose models are the schema); JavaScript not TypeScript. All four are recorded in `CLAUDE.md` and **must not be reported as defects** |
+| Audit logging | **`AuditLog` model with a single append point** at `server/src/services/audit.service.js:10` *(detected)*. Append-only: nothing imports the model elsewhere and no update or delete path exists, both asserted by `test/audit.test.js`. **Known gap:** a failed login records no source, so repeated failures cannot be attributed — `BE-01-02 AC-3`, failing test in `test/login-rate-limit.test.js` |
+| Known exceptions | no migrations (Mongoose models are the schema); JavaScript not TypeScript. Both are recorded in `CLAUDE.md` and **must not be reported as defects**. Two former exceptions have lapsed: the server now has a test runner (see above), and auth exists as of `BE-01`. The client's `npm test` still exits 1 by design |
 
 ## Compliance
 
