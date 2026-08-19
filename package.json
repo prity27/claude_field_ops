@@ -1,0 +1,13 @@
+{
+  "name": "fieldops",
+  "private": true,
+  "version": "0.1.0",
+  "description": "FieldOps — field-service job scheduling. Monorepo: Express/Mongoose API and a React SPA.",
+  "workspaces": ["server", "client"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "npm run dev --workspace=server & npm run dev --workspace=client",
+    "gate": "npm run gate --workspace=server && npm run gate --workspace=client",
+    "test": "npm test --workspace=server --if-present && npm test --workspace=client --if-present"
+  }
+}

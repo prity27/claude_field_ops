@@ -1,0 +1,24 @@
+{
+  "name": "@fieldops/client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src",
+    "gate": "npm run lint && npm run build",
+    "test": "echo 'no test runner configured yet — see docs/delivery/PROFILE.md' && exit 1"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.9.0",
+    "vite": "^5.4.0"
+  }
+}
