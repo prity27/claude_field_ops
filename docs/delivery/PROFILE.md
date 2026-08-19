@@ -27,7 +27,7 @@ Last updated: 2026-08-19 · Updated by: Claude (detection) — human rows pendin
 | Field | Value |
 | --- | --- |
 | Stage | `scaffolded` *(detected)* |
-| Evidence for that stage | API boots and serves one route — `server/src/routes/health.js:11`; client renders it — `client/src/pages/HealthPage.jsx:5`; `server/src/models/` and `server/src/services/` are empty |
+| Evidence for that stage | API boots and serves one route — `server/src/routes/health.js:11`; client renders it — `client/src/pages/HealthPage.jsx:5`. Seven Mongoose models exist (`server/src/models/`) but nothing reads or writes them yet; `server/src/services/` is still empty |
 | Estimated completeness | ~0% of intended scope — infrastructure only, no domain logic exists |
 | Activity | one commit, one author, 2026-08-19 |
 | Repository layout | single repo, npm workspaces: `server/` + `client/` *(detected — `package.json:6`)* |
@@ -47,8 +47,8 @@ Greenfield project: the three brownfield lists do not apply.
 | Framework | Express 4.19 *(detected)* |
 | Package manager | npm 11.16 with root `package-lock.json` committed *(detected)* |
 | Build step | **none** — runs `node src/index.js` directly *(detected)* |
-| Database | MongoDB via Mongoose 8.5 *(detected)* |
-| Migrations | **none — schema lives only in the Mongoose models** *(detected: no `migrations/`, no migration tool in deps)* |
+| Database | MongoDB via Mongoose 8.5 *(detected)*. **Must run as a replica set** — decided at the `/design-schema` gate 2026-08-19, because transactions are required and a standalone `mongod` cannot provide them |
+| Migrations | **none — schema lives only in the Mongoose models** *(detected)*. `INF-00-08` is the decision story for whether that stays |
 | Gate commands | `npm run lint --workspace=server` — **ran 2026-08-19, clean** |
 | Test runner | **none configured.** `npm test` exits 1 by design — **ran 2026-08-19, fails as expected** |
 | Entry point | `server/src/index.js` *(detected — `package.json` `main` and `start` agree)* |

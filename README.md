@@ -21,12 +21,19 @@ delivery chain in `docs/`.
 ```bash
 git clone <remote> fieldops && cd fieldops
 npm install                        # root only — workspaces install both
-cp .env.example server/.env        # then edit MONGODB_URI if yours is not local
+
+# MongoDB must run as a replica set. A standalone mongod cannot do transactions,
+# and seven of this project's processes require them (docs/delivery/SCHEMA.md).
+mongod --replSet rs0 --dbpath /your/data/path
+mongosh --eval 'rs.initiate()'     # once, ever
+
+cp .env.example server/.env        # then edit MONGODB_URI and OPERATING_TIMEZONE
 npm run dev                        # API on :4000, client on :5173
 ```
 
 MongoDB must be reachable before `npm run dev`, or the API exits at boot with the connection error —
-by design, rather than starting and failing on the first request.
+by design, rather than starting and failing on the first request. The same is true of a missing
+`OPERATING_TIMEZONE`.
 
 Verify: `curl -s localhost:4000/api/health` returns `{"status":"ok","db":"connected",...}`, and
 <http://localhost:5173> shows the same.
@@ -37,7 +44,8 @@ Every variable the server reads, all validated in `server/src/config/env.js`:
 
 | Variable | Required | Default | Purpose |
 | --- | --- | --- | --- |
-| `MONGODB_URI` | **yes** | — | connection string; absence fails at boot |
+| `MONGODB_URI` | **yes** | — | connection string; **must name a replica set**; absence fails at boot |
+| `OPERATING_TIMEZONE` | **yes** | — | IANA zone for the business day, e.g. `Asia/Kolkata` |
 | `PORT` | no | `4000` | API listen port |
 | `NODE_ENV` | no | `development` | `production` withholds 500 messages from clients |
 | `CORS_ORIGIN` | no | `http://localhost:5173` | allowed browser origin |
