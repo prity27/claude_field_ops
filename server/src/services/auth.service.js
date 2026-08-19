@@ -13,13 +13,23 @@ import * as audit from './audit.service.js';
 // One constant, used for all three, so no future edit can accidentally split them apart.
 const LOGIN_FAILED = () => new AppError(401, 'invalid_credentials', 'Invalid email or password');
 
-export async function login(email, password) {
+/**
+ * `source` is where the attempt came from, threaded in by the route (`routes/auth.js`). A failure
+ * against an unknown email has no actor, so the source is the only thing that attributes it —
+ * see the caveat in the audit calls below when there is no request context at all.
+ */
+export async function login(email, password, { source = null } = {}) {
   const user = await User.findOne({ email: String(email).toLowerCase() }).select('+passwordHash');
 
   if (!user) {
     // Burn comparable time so a missing account cannot be detected by response latency.
     await burnVerificationTime();
-    await audit.record({ action: 'login.failure', outcome: 'denied', metadata: { reason: 'no_user' } });
+    await audit.record({
+      action: 'login.failure',
+      outcome: 'denied',
+      source,
+      metadata: { reason: 'no_user' },
+    });
     throw LOGIN_FAILED();
   }
 
@@ -29,13 +39,14 @@ export async function login(email, password) {
       actor: user._id,
       action: 'login.failure',
       outcome: 'denied',
+      source,
       metadata: { reason: ok ? 'inactive' : 'bad_password' },
     });
     throw LOGIN_FAILED();
   }
 
   const tokens = await issueSession(user);
-  await audit.record({ actor: user._id, action: 'login.success', outcome: 'success' });
+  await audit.record({ actor: user._id, action: 'login.success', outcome: 'success', source });
   return { user: publicUser(user), ...tokens };
 }
 

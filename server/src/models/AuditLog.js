@@ -28,6 +28,10 @@ const auditLogSchema = new mongoose.Schema(
     targetType: { type: String, default: null },
     targetId: { type: mongoose.Schema.Types.ObjectId, default: null },
     outcome: { type: String, required: true, enum: ['success', 'denied'] },
+    // Where the request came from, when a request produced this entry. An unauthenticated failure
+    // has no actor to attribute it to, so the origin is the only thing that identifies it at all.
+    // Null for entries with no request behind them (a background job, a direct service call).
+    source: { type: String, default: null },
     metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
   },
   { timestamps: { createdAt: true, updatedAt: false } },

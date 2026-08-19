@@ -1,4 +1,5 @@
 import { AppError } from './errorHandler.js';
+import { clientSource } from '../lib/requestSource.js';
 
 /**
  * BE-01-02 AC-3: login attempts are rate-limited.
@@ -9,7 +10,7 @@ import { AppError } from './errorHandler.js';
  * single-process deployment and must be replaced with a shared store (Redis) before scaling
  * horizontally — see PROFILE.md.
  */
-export function rateLimit({ windowMs, max, key = (req) => req.ip }) {
+export function rateLimit({ windowMs, max, key = clientSource }) {
   const hits = new Map();
 
   // Sweep expired buckets so the map cannot grow without bound on a long-running process.

@@ -4,6 +4,7 @@ import { validateBody } from '../middleware/validate.js';
 import { setAuthCookies, clearAuthCookies, REFRESH_COOKIE } from '../lib/cookies.js';
 import { config } from '../config/env.js';
 import { rateLimit } from '../middleware/rateLimit.js';
+import { clientSource } from '../lib/requestSource.js';
 
 export const authRouter = Router();
 
@@ -23,7 +24,9 @@ authRouter.post(
   async (req, res, next) => {
     try {
       const { email, password } = req.validated;
-      const { user, accessToken, refreshToken, csrfToken } = await auth.login(email, password);
+      const { user, accessToken, refreshToken, csrfToken } = await auth.login(email, password, {
+        source: clientSource(req),
+      });
       setAuthCookies(res, {
         accessToken,
         refreshToken,
