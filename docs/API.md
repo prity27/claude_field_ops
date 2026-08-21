@@ -1,6 +1,8 @@
 # API contract
 
-> Written from the routes as they exist on 2026-08-19, verified by exercising each one against a running server. Base path `/api`, port 4000.
+> Written from the routes as they exist on 2026-08-21, verified by exercising each one against a running server. Base path `/api`, port 4000.
+> Customers (`BE-02`) were added on 2026-08-21 and are documented from the routes and from the 41
+> tests in `server/test/customers.test.js` that exercise them — not from a running server.
 > Every endpoint here was read from code; none has been exercised against a deployed instance.
 > Regenerate with `/write-docs` after any epic that adds or changes a route.
 
@@ -82,9 +84,87 @@ All are `SameSite=Strict`, and `Secure` when `NODE_ENV=production`.
 Fields outside the documented body are **dropped**, not rejected — `_id`, `active`, `passwordHash`
 and anything else in a request body never reach the model.
 
+### Customers
+
+**Protected.** Every route below requires a session, and every state-changing request requires the
+`x-csrf-token` header matching the `fo_csrf` cookie — `403 csrf_failed` otherwise.
+
+Customers are **records, not accounts** — nothing here issues a credential
+(`dec-no-customer-login`). There is **no delete endpoint**: `DELETE /api/customers/:id` is an
+unknown route and answers `404 not_found`. Removal is archiving, below (`BE-02-05 AC-5`).
+
+| Endpoint | Role | Body | Success | Failure |
+| --- | --- | --- | --- | --- |
+| `POST /api/customers` | dispatcher | `{name, siteAddress, contactPhone?, contactEmail?}` | `201 {customer}` | `400 invalid_body` · `403 forbidden` |
+| `GET /api/customers` | any | — (query below) | `200 {customers, page}` | `400 invalid_body` |
+| `GET /api/customers/:id` | any | — | `200 {customer}` | `404 customer_not_found` |
+| `PATCH /api/customers/:id` | dispatcher | any of `{name, siteAddress, contactPhone, contactEmail}` | `200 {customer}` | `400 invalid_body` · `403 forbidden` · `404 customer_not_found` |
+| `POST /api/customers/:id/archive` | dispatcher | — | `200 {customer}` | `403 forbidden` · `404 customer_not_found` · `409 customer_has_open_jobs` |
+
+The `customer` object:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | string | ObjectId |
+| `name` | string | ≤ 160 characters — **PII** (`SCHEMA.md:101`) |
+| `siteAddress` | string | ≤ 500 characters — **PII** |
+| `contactPhone` | string \| null | ≤ 40 characters — **PII** |
+| `contactEmail` | string \| null | ≤ 254 characters, lower-cased — **PII** |
+| `archived` | boolean | soft-delete state; `false` on create |
+| `archivedAt` | ISO 8601 \| null | stamped when archiving succeeds |
+| `createdAt` / `updatedAt` | ISO 8601 | server-set; not settable from a body |
+
+Retention for the four PII fields is **unset** — `q-pii-retention` in
+`docs/knowledge/OPEN-QUESTIONS.md` is still open, so no expiry is applied and none is implied.
+
+**Fields outside the documented body are dropped**, as everywhere else — `archived`, `_id` and
+`createdAt` in a create body are ignored (`BE-02-01 AC-4`). The one exception is `PATCH`, which
+**rejects** `archived` and `archivedAt` with `400 invalid_body` rather than dropping them: they are
+owned by the archive endpoint and its rules, and silently ignoring them would let a caller believe
+they had archived a customer (`BE-02-04 AC-2`). A `PATCH` with no recognised field is also a
+`400` rather than a no-op `200`.
+
+**Concurrent updates resolve last-write-wins.** Only the fields present in a request are written,
+so two updates to *different* fields both survive; two to the *same* field resolve to whichever
+reached MongoDB second. There is no version or `If-Match` precondition (`BE-02-04 AC-4`).
+
+`GET /api/customers` query parameters:
+
+| Parameter | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `page` | integer ≥ 1 | `1` | below 1 is **clamped** to 1 |
+| `pageSize` | integer 1–100 | `25` | **maximum 100**; a larger value is clamped to 100, not rejected (`BE-02-03 AC-5`) |
+| `includeArchived` | `true` \| `false` | `false` | archived customers are excluded unless this is `true` (`BE-02-03 AC-3`) |
+
+A non-numeric `page` or `pageSize` is `400 invalid_body`. The response envelope:
+
+```json
+{
+  "customers": [{ "id": "...", "name": "Northgate Dental", "archived": false }],
+  "page": { "page": 1, "pageSize": 25, "total": 42, "totalPages": 2, "maxPageSize": 100 }
+}
+```
+
+Order is `name` ascending with `_id` breaking ties, always — there is no `sort` parameter. The
+tiebreak is correctness, not cosmetics: two customers sharing a name can otherwise swap places
+between the query for page 1 and the query for page 2, and one of them is then never returned.
+
+**Technician scoping.** A technician reads only the customers attached to a job assigned to them
+(`BE-02-02 AC-3`, `BE-02-03 AC-4`). Any other id answers `404 customer_not_found` rather than
+`403` — a `403` would confirm the id exists and turn the endpoint into an enumeration oracle for
+the whole customer list. A technician's list is scoped the same way, and a technician with no
+assignments gets an empty page rather than the full one.
+
+**Archiving** is idempotent: archiving an already-archived customer is `200` with the state
+unchanged, `archivedAt` included (`BE-02-05 AC-4`). It is refused with `409
+customer_has_open_jobs` when the customer has any job outside `completed`, `invoiced` and
+`cancelled`; the message names how many. An archived customer is out of the default list but still
+resolves by id, so existing records keep referring to it (`BE-02-05 AC-3`).
+
+Source: `server/src/routes/customers.js`, `server/src/services/customer.service.js`.
+
 ## Not in the contract yet
 
-No customer, job, assignment, technician or invoice endpoint exists. They arrive per approved epic
-through `/build-module`, and this file is regenerated from the code each time rather than written
-ahead of it — an API doc describing endpoints that do not exist is how a contract stops being
-trusted.
+No job, assignment, technician or invoice endpoint exists. They arrive per approved epic through
+`/build-module`, and this file is regenerated from the code each time rather than written ahead of
+it — an API doc describing endpoints that do not exist is how a contract stops being trusted.

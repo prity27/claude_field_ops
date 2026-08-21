@@ -5,6 +5,7 @@ import { config } from './config/env.js';
 import { healthRouter } from './routes/health.js';
 import { authRouter } from './routes/auth.js';
 import { usersRouter } from './routes/users.js';
+import { customersRouter } from './routes/customers.js';
 import { authenticate } from './middleware/authenticate.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
@@ -28,6 +29,7 @@ export function createApp() {
   app.use('/api', csrfProtection);
 
   app.use('/api', usersRouter);
+  app.use('/api', customersRouter);
 
   app.use(notFound);
   app.use(errorHandler);
